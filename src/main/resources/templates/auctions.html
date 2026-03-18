@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список аукционов</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/main.js}" defer></script>
+</head>
+<body>
+<header>
+    <h1>Онлайн Аукцион</h1>
+</header>
+
+<table>
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Владелец</th>
+        <th>Начало</th>
+        <th>Конец</th>
+        <th>Ставка</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="auction : ${auctions}">
+        <td th:text="${auction.title}"></td>
+        <td th:text="${auction.description}"></td>
+        <td th:text="${auction.owner.username}"></td>
+        <td th:text="${#dates.format(auction.startTime, 'dd/MM/yyyy HH:mm')}"></td>
+        <td th:text="${#dates.format(auction.endTime, 'dd/MM/yyyy HH:mm')}"></td>
+        <td>
+            <form th:action="@{/api/bids/place}" method="post">
+                <input type="hidden" name="auctionId" th:value="${auction.id}" />
+                <input type="number" name="amount" placeholder="Сумма" min="1" required/>
+                <button type="submit">Сделать ставку</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
