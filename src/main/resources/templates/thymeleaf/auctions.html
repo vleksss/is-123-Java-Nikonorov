@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Аукцион на Thymeleaf</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <div>
+            <h1>Аукцион на Thymeleaf</h1>
+            <p>Текущий движок: Thymeleaf</p>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/mustache/auctions}">Mustache</a>
+            <a th:href="@{/freemarker/auctions}">FreeMarker</a>
+            <a th:href="@{/logout}">Выход</a>
+        </div>
+    </div>
+
+    <div class="success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="card" style="margin-bottom: 24px;" th:if="${canCreateAuction}">
+        <h2>Создать аукцион</h2>
+        <form th:action="@{/owner/auctions}" method="post" class="form-grid">
+            <label>Название <input type="text" name="title" required></label>
+            <label>Описание <input type="text" name="description" required></label>
+            <label>Начальная цена <input type="number" step="0.01" name="startPrice" required></label>
+            <label>Дата начала <input type="datetime-local" name="startTime" required></label>
+            <label>Дата окончания <input type="datetime-local" name="endTime" required></label>
+            <button type="submit">Создать</button>
+        </form>
+    </div>
+
+    <div class="auction-grid">
+        <div class="card" th:each="auction : ${auctions}">
+            <h3 th:text="${auction.title}">Название</h3>
+            <p th:text="${auction.description}">Описание</p>
+            <p><strong>Владелец:</strong> <span th:text="${auction.ownerUsername}">owner</span></p>
+            <p><strong>Статус:</strong> <span th:text="${auction.status}">ACTIVE</span></p>
+            <p><strong>Текущая цена:</strong> <span th:text="${auction.currentPrice}">0</span></p>
+            <p><strong>Окончание:</strong> <span th:text="${auction.endTime}">2026-01-01T10:00</span></p>
+
+            <form th:action="@{/bids}" method="post" class="form-grid">
+                <input type="hidden" name="auctionId" th:value="${auction.id}">
+                <label>Ставка <input type="number" step="0.01" name="amount" required></label>
+                <button type="submit">Сделать ставку</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
