@@ -5,20 +5,29 @@
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
-<div class="container narrow">
-    <h1>Вход в систему</h1>
+<body class="auth-body">
+<div class="auth-shell">
+    <div class="auth-brand">
+        <span class="brand-badge">Auction</span>
+        <h1>Интеллектуальная платформа аукционов</h1>
+        <p>Авторизация в системе с ролями USER, OWNER и ADMIN.</p>
+    </div>
 
-    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
-    <div class="success" th:if="${logoutMessage}" th:text="${logoutMessage}"></div>
-
-    <form method="post" th:action="@{/login}" class="card form-grid">
-        <label>Логин <input type="text" name="username"></label>
-        <label>Пароль <input type="password" name="password"></label>
-        <button type="submit">Войти</button>
-    </form>
-
-    <a th:href="@{/register}">Регистрация</a>
+    <div class="auth-card">
+        <h2>Вход в систему</h2>
+        <div class="alert error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <div class="alert success" th:if="${logoutMessage}" th:text="${logoutMessage}"></div>
+        <form method="post" th:action="@{/login}" class="form-grid">
+            <label>Логин
+                <input type="text" name="username" required>
+            </label>
+            <label>Пароль
+                <input type="password" name="password" required>
+            </label>
+            <button class="primary-button" type="submit">Войти</button>
+        </form>
+        <a class="auth-link" th:href="@{/register}">Создать аккаунт</a>
+    </div>
 </div>
 </body>
 </html>

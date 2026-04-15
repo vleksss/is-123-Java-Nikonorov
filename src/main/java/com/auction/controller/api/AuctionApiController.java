@@ -32,7 +32,12 @@ public class AuctionApiController {
     }
 
     @PostMapping("/admin/auctions/{id}/close")
-    public AuctionCardDto close(@PathVariable Long id) {
-        return auctionFacade.closeAuction(id);
+    public AuctionCardDto closeByAdmin(@PathVariable Long id) {
+        return auctionFacade.closeAuctionByAdmin(id);
+    }
+
+    @PostMapping("/owner/auctions/{id}/close")
+    public AuctionCardDto closeByOwner(@PathVariable Long id, Authentication authentication) {
+        return auctionFacade.closeAuctionByOwner(id, authentication.getName());
     }
 }

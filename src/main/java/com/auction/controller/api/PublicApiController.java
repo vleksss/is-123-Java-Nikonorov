@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/public")
 @RequiredArgsConstructor
@@ -17,7 +19,13 @@ public class PublicApiController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public User register(@Valid @RequestBody RegisterRequest request) {
-        return userService.register(request);
+    public Map<String, Object> register(@Valid @RequestBody RegisterRequest request) {
+        User user = userService.register(request);
+        return Map.of(
+                "id", user.getId(),
+                "username", user.getUsername(),
+                "email", user.getEmail(),
+                "role", user.getRole().name()
+        );
     }
 }

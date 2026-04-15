@@ -25,11 +25,9 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/login", "/register", "/api/public/**").permitAll()
-                        .requestMatchers("/owner/**").hasRole("OWNER")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/owner/**").hasRole("OWNER")
-                        .requestMatchers("/", "/thymeleaf/**", "/mustache/**", "/freemarker/**", "/bids").authenticated()
+                        .requestMatchers("/owner/**", "/api/owner/**").hasRole("OWNER")
+                        .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/", "/profile", "/thymeleaf/**", "/mustache/**", "/freemarker/**", "/bids").authenticated()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -41,7 +39,6 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll())
                 .httpBasic(Customizer.withDefaults());
-
         return http.build();
     }
 

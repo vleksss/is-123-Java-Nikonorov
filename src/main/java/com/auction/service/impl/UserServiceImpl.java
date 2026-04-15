@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Пользователь с таким email уже существует");
         }
-
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -33,7 +32,6 @@ public class UserServiceImpl implements UserService {
                 .role(Role.USER)
                 .enabled(true)
                 .build();
-
         return userRepository.save(user);
     }
 
@@ -50,5 +48,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public User updateRole(Long id, Role role) {
+        User user = getById(id);
+        user.setRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User changeEnabled(Long id, boolean enabled) {
+        User user = getById(id);
+        user.setEnabled(enabled);
+        return userRepository.save(user);
     }
 }

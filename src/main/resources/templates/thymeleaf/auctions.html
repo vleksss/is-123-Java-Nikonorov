@@ -6,50 +6,98 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="container">
-    <div class="topbar">
-        <div>
-            <h1>Аукцион на Thymeleaf</h1>
-            <p>Текущий движок: Thymeleaf</p>
+<div class="page-shell">
+    <aside class="sidebar">
+        <div class="brand-card">
+            <span class="brand-badge">Auction</span>
+            <h1>Платформа торгов</h1>
+            <p>Thymeleaf-интерфейс для управления ставками, кабинетами и ролями.</p>
         </div>
-        <div class="nav-links">
+        <nav class="side-nav">
+            <a class="active" th:href="@{/thymeleaf/auctions}">Каталог</a>
             <a th:href="@{/mustache/auctions}">Mustache</a>
             <a th:href="@{/freemarker/auctions}">FreeMarker</a>
+            <a th:href="@{/profile}">Личный кабинет</a>
+            <a th:if="${isOwner}" th:href="@{/owner/dashboard}">Кабинет владельца</a>
+            <a th:if="${isAdmin}" th:href="@{/admin/dashboard}">Панель администратора</a>
             <a th:href="@{/logout}">Выход</a>
-        </div>
-    </div>
+        </nav>
+    </aside>
 
-    <div class="success" th:if="${successMessage}" th:text="${successMessage}"></div>
-    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <main class="content">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">Главная витрина</p>
+                <h2>Добро пожаловать, <span th:text="${currentUser}">user</span></h2>
+                <p>Здесь собраны все аукционы, текущие цены и быстрые формы для участия в торгах.</p>
+            </div>
+            <div class="hero-actions">
+                <span class="stat-pill" th:text="|Всего аукционов: ${#lists.size(auctions)}|"></span>
+                <span class="stat-pill" th:if="${isOwner}">Доступно создание лотов</span>
+                <span class="stat-pill" th:if="${isAdmin}">Активна админ-панель</span>
+            </div>
+        </section>
 
-    <div class="card" style="margin-bottom: 24px;" th:if="${canCreateAuction}">
-        <h2>Создать аукцион</h2>
-        <form th:action="@{/owner/auctions}" method="post" class="form-grid">
-            <label>Название <input type="text" name="title" required></label>
-            <label>Описание <input type="text" name="description" required></label>
-            <label>Начальная цена <input type="number" step="0.01" name="startPrice" required></label>
-            <label>Дата начала <input type="datetime-local" name="startTime" required></label>
-            <label>Дата окончания <input type="datetime-local" name="endTime" required></label>
-            <button type="submit">Создать</button>
-        </form>
-    </div>
+        <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+        <div class="alert error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
-    <div class="auction-grid">
-        <div class="card" th:each="auction : ${auctions}">
-            <h3 th:text="${auction.title}">Название</h3>
-            <p th:text="${auction.description}">Описание</p>
-            <p><strong>Владелец:</strong> <span th:text="${auction.ownerUsername}">owner</span></p>
-            <p><strong>Статус:</strong> <span th:text="${auction.status}">ACTIVE</span></p>
-            <p><strong>Текущая цена:</strong> <span th:text="${auction.currentPrice}">0</span></p>
-            <p><strong>Окончание:</strong> <span th:text="${auction.endTime}">2026-01-01T10:00</span></p>
-
-            <form th:action="@{/bids}" method="post" class="form-grid">
-                <input type="hidden" name="auctionId" th:value="${auction.id}">
-                <label>Ставка <input type="number" step="0.01" name="amount" required></label>
-                <button type="submit">Сделать ставку</button>
+        <section class="panel-card" th:if="${canCreateAuction}">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Роль OWNER</p>
+                    <h3>Создание нового аукциона</h3>
+                </div>
+            </div>
+            <form th:action="@{/owner/auctions}" method="post" class="form-grid two-columns">
+                <label>Название
+                    <input type="text" name="title" required>
+                </label>
+                <label>Начальная цена
+                    <input type="number" step="0.01" name="startPrice" required>
+                </label>
+                <label class="full-width">Описание
+                    <textarea name="description" rows="4" required></textarea>
+                </label>
+                <label>Дата начала
+                    <input type="datetime-local" name="startTime" required>
+                </label>
+                <label>Дата окончания
+                    <input type="datetime-local" name="endTime" required>
+                </label>
+                <button class="primary-button full-width" type="submit">Создать аукцион</button>
             </form>
-        </div>
-    </div>
+        </section>
+
+        <section>
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Актуальные лоты</p>
+                    <h3>Все аукционы</h3>
+                </div>
+            </div>
+
+            <div class="auction-grid">
+                <article class="auction-card" th:each="auction : ${auctions}">
+                    <div class="auction-meta">
+                        <span class="tag" th:text="${auction.status}">ACTIVE</span>
+                        <span class="muted" th:text="|До ${#temporals.format(auction.endTime, 'dd.MM.yyyy HH:mm')}|"></span>
+                    </div>
+                    <h4 th:text="${auction.title}">Название</h4>
+                    <p class="auction-description" th:text="${auction.description}">Описание</p>
+                    <div class="detail-row"><span>Владелец</span><strong th:text="${auction.ownerUsername}">owner</strong></div>
+                    <div class="detail-row"><span>Текущая цена</span><strong th:text="${auction.currentPrice}">0</strong></div>
+                    <div class="detail-row"><span>Старт</span><strong th:text="${#temporals.format(auction.startTime, 'dd.MM.yyyy HH:mm')}">0</strong></div>
+                    <form th:action="@{/bids}" method="post" class="form-grid compact-form">
+                        <input type="hidden" name="auctionId" th:value="${auction.id}">
+                        <label>Ваша ставка
+                            <input type="number" step="0.01" name="amount" required>
+                        </label>
+                        <button class="primary-button" type="submit">Сделать ставку</button>
+                    </form>
+                </article>
+            </div>
+        </section>
+    </main>
 </div>
 </body>
 </html>

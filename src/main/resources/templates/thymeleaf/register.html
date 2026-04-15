@@ -5,16 +5,31 @@
     <title>Регистрация</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
-<div class="container narrow">
-    <h1>Регистрация</h1>
-    <div class="error" th:if="${error}" th:text="${error}"></div>
-    <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="card form-grid">
-        <label>Логин <input type="text" th:field="*{username}"></label>
-        <label>Email <input type="email" th:field="*{email}"></label>
-        <label>Пароль <input type="password" th:field="*{password}"></label>
-        <button type="submit">Создать аккаунт</button>
-    </form>
+<body class="auth-body">
+<div class="auth-shell">
+    <div class="auth-brand">
+        <span class="brand-badge">Join</span>
+        <h1>Создание аккаунта участника</h1>
+        <p>После регистрации пользователь получает роль USER и может участвовать в торгах.</p>
+    </div>
+
+    <div class="auth-card">
+        <h2>Регистрация</h2>
+        <div class="alert error" th:if="${error}" th:text="${error}"></div>
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="form-grid">
+            <label>Логин
+                <input type="text" th:field="*{username}" required>
+            </label>
+            <label>Email
+                <input type="email" th:field="*{email}" required>
+            </label>
+            <label>Пароль
+                <input type="password" th:field="*{password}" required>
+            </label>
+            <button class="primary-button" type="submit">Создать аккаунт</button>
+        </form>
+        <a class="auth-link" th:href="@{/login}">У меня уже есть аккаунт</a>
+    </div>
 </div>
 </body>
 </html>

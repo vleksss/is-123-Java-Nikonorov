@@ -11,5 +11,8 @@ public interface AuctionService {
     List<Auction> getAll();
     List<Auction> getActive();
     List<Auction> getByOwner(String username);
-    Auction close(Long id);
+    List<Auction> getParticipating(String username);
+    List<Auction> getWinning(String username);
+    Auction closeByAdmin(Long id);
+    Auction closeByOwner(Long id, String username);
 }

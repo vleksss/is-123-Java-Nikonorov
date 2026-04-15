@@ -3,21 +3,26 @@ package com.auction.service.impl;
 import com.auction.dto.AuctionRequest;
 import com.auction.model.Auction;
 import com.auction.model.AuctionStatus;
+import com.auction.model.Bid;
 import com.auction.model.Role;
 import com.auction.model.User;
 import com.auction.repository.AuctionRepository;
+import com.auction.repository.BidRepository;
 import com.auction.service.AuctionService;
 import com.auction.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
+    private final BidRepository bidRepository;
     private final UserService userService;
 
     @Override
@@ -49,7 +54,9 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public List<Auction> getAll() {
-        return auctionRepository.findAll();
+        return auctionRepository.findAll().stream()
+                .sorted(Comparator.comparing(Auction::getEndTime).reversed())
+                .toList();
     }
 
     @Override
@@ -63,8 +70,40 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public Auction close(Long id) {
+    public List<Auction> getParticipating(String username) {
+        User user = userService.getByUsername(username);
+        return bidRepository.findByUserOrderByBidTimeDesc(user).stream()
+                .map(Bid::getAuction)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted(Comparator.comparing(Auction::getEndTime).reversed())
+                .toList();
+    }
+
+    @Override
+    public List<Auction> getWinning(String username) {
+        User user = userService.getByUsername(username);
+        return getParticipating(username).stream()
+                .filter(auction -> auction.getStatus() == AuctionStatus.CLOSED)
+                .filter(auction -> bidRepository.findTopByAuctionOrderByAmountDesc(auction)
+                        .map(bid -> bid.getUser().getId().equals(user.getId()))
+                        .orElse(false))
+                .toList();
+    }
+
+    @Override
+    public Auction closeByAdmin(Long id) {
         Auction auction = getById(id);
+        auction.setStatus(AuctionStatus.CLOSED);
+        return auctionRepository.save(auction);
+    }
+
+    @Override
+    public Auction closeByOwner(Long id, String username) {
+        Auction auction = getById(id);
+        if (!auction.getOwner().getUsername().equals(username)) {
+            throw new IllegalStateException("Можно закрыть только свой аукцион");
+        }
         auction.setStatus(AuctionStatus.CLOSED);
         return auctionRepository.save(auction);
     }

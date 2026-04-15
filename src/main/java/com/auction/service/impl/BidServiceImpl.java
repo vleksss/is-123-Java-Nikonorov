@@ -28,6 +28,9 @@ public class BidServiceImpl implements BidService {
     public Bid placeBid(BidRequest request, String username) {
         Auction auction = auctionService.getById(request.getAuctionId());
         User user = userService.getByUsername(username);
+        if (!user.isEnabled()) {
+            throw new IllegalStateException("Ваш аккаунт заблокирован");
+        }
         BigDecimal currentPrice = getCurrentPrice(auction.getId());
         bidValidationStrategy.validate(auction, currentPrice, request.getAmount(), user.getUsername());
         Bid bid = Bid.builder()
@@ -50,5 +53,10 @@ public class BidServiceImpl implements BidService {
     @Override
     public List<Bid> getAuctionBids(Long auctionId) {
         return bidRepository.findByAuctionOrderByAmountDesc(auctionService.getById(auctionId));
+    }
+
+    @Override
+    public List<Bid> getUserBids(String username) {
+        return bidRepository.findByUserOrderByBidTimeDesc(userService.getByUsername(username));
     }
 }

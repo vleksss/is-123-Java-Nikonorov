@@ -10,4 +10,5 @@ public interface BidService {
     Bid placeBid(BidRequest request, String username);
     BigDecimal getCurrentPrice(Long auctionId);
     List<Bid> getAuctionBids(Long auctionId);
+    List<Bid> getUserBids(String username);
 }
