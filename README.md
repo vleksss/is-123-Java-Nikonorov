@@ -162,9 +162,10 @@ SQL-скрипты находятся в папке:
 
 ### Порядок подготовки базы
 
-1. Создать пустую базу RED Database.
-2. Выполнить `schema-red.sql`.
-3. Выполнить `demo-data.sql`.
+1. Создать в корне проекта папку `database`, если её нет.
+2. Создать пустую базу RED Database по пути `database/auction.fdb`.
+3. Выполнить `schema-red.sql`.
+4. Выполнить `demo-data.sql`.
 
 ---
 
@@ -182,7 +183,7 @@ SQL-скрипты находятся в папке:
 
 - `DB_HOST=localhost`
 - `DB_PORT=3050`
-- `DB_PATH=C:/basa/auction.fdb`
+- `DB_PATH=<папка_проекта>/database/auction.fdb`
 - `DB_USERNAME=SYSDBA`
 - `DB_PASSWORD=masterkey`
 
