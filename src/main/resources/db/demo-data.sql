@@ -1,8 +1,19 @@
 INSERT INTO APP_USER (USERNAME, EMAIL, PASSWORD, ROLE, ENABLED)
-VALUES ('admin', 'admin@auction.local', '$2a$10$3euPcmQFCiblsZeEu5s7p.9B9Qdr4RweO5QfMByw6h8fC4Jj9v5M2', 'ADMIN', TRUE);
+VALUES ('admin', 'admin@auction.local', '$2a$10$euQj1J8A2gQW4v3ZQYwB5e2S2JmP0f2fYQx5n3Q4q1wT2e8KQjZ1C', 'ADMIN', TRUE);
 
 INSERT INTO APP_USER (USERNAME, EMAIL, PASSWORD, ROLE, ENABLED)
-VALUES ('owner', 'owner@auction.local', '$2a$10$3euPcmQFCiblsZeEu5s7p.9B9Qdr4RweO5QfMByw6h8fC4Jj9v5M2', 'OWNER', TRUE);
+VALUES ('owner', 'owner@auction.local', '$2a$10$euQj1J8A2gQW4v3ZQYwB5e2S2JmP0f2fYQx5n3Q4q1wT2e8KQjZ1C', 'OWNER', TRUE);
 
 INSERT INTO APP_USER (USERNAME, EMAIL, PASSWORD, ROLE, ENABLED)
-VALUES ('user', 'user@auction.local', '$2a$10$3euPcmQFCiblsZeEu5s7p.9B9Qdr4RweO5QfMByw6h8fC4Jj9v5M2', 'USER', TRUE);
+VALUES ('user', 'user@auction.local', '$2a$10$euQj1J8A2gQW4v3ZQYwB5e2S2JmP0f2fYQx5n3Q4q1wT2e8KQjZ1C', 'USER', TRUE);
+
+INSERT INTO AUCTION (TITLE, DESCRIPTION, START_PRICE, START_TIME, END_TIME, STATUS, OWNER_ID)
+VALUES (
+    'Тестовый аукцион',
+    'Стартовый аукцион для демонстрации проекта',
+    10000.00,
+    CURRENT_TIMESTAMP,
+    DATEADD(7 DAY TO CURRENT_TIMESTAMP),
+    'ACTIVE',
+    (SELECT ID FROM APP_USER WHERE USERNAME = 'owner')
+);
