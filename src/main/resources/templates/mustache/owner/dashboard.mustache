@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Кабинет владельца</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="page-shell">
+    <aside class="sidebar">
+        <div class="brand-card">
+            <span class="brand-badge">Owner</span>
+            <h1>Кабинет владельца</h1>
+            <p>Управление собственными аукционами.</p>
+        </div>
+        <nav class="side-nav">
+            <a href="/mustache/auctions">Каталог</a>
+            <a href="/mustache/profile">Мой кабинет</a>
+            <a class="active" href="/mustache/owner/dashboard">Кабинет владельца</a>
+            <a href="/logout">Выход</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        {{#successMessage}}<div class="alert success">{{successMessage}}</div>{{/successMessage}}
+        {{#errorMessage}}<div class="alert error">{{errorMessage}}</div>{{/errorMessage}}
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">OWNER</p>
+                <h2>Ваши аукционы</h2>
+                <p>Просмотр ставок и ручное закрытие лотов.</p>
+            </div>
+        </section>
+        <section class="panel-card">
+            <div class="table-list">
+                {{#ownerAuctions}}
+                <div class="table-row with-actions">
+                    <div><strong>{{title}}</strong><p>{{formattedEndTime}}</p></div>
+                    <div><strong>{{currentPrice}}</strong><p>{{status}}</p></div>
+                    <div class="row-actions">
+                        <a class="secondary-link" href="/mustache/owner/auctions/{{id}}/bids">История ставок</a>
+                        <form action="/mustache/owner/auctions/{{id}}/close" method="post">
+                            <button class="danger-button" type="submit">Закрыть</button>
+                        </form>
+                    </div>
+                </div>
+                {{/ownerAuctions}}
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

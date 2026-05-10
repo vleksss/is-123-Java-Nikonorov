@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ставки по аукциону</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">OWNER</p>
+                <h2>Ставки по аукциону #{{auctionId}}</h2>
+                <p>Полная история ставок по выбранному лоту владельца.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/mustache/owner/dashboard">Назад</a>
+                <a class="secondary-link" href="/mustache/auctions">Каталог</a>
+                <a class="secondary-link" href="/logout">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option value="/thymeleaf/owner/auctions/{{auctionId}}/bids">Thymeleaf</option>
+                    <option value="/mustache/owner/auctions/{{auctionId}}/bids" selected>Mustache</option>
+                    <option value="/freemarker/owner/auctions/{{auctionId}}/bids">FreeMarker</option>
+                </select>
+            </div>
+        </section>
+
+        {{#successMessage}}<div class="alert success">{{successMessage}}</div>{{/successMessage}}
+        {{#errorMessage}}<div class="alert error">{{errorMessage}}</div>{{/errorMessage}}
+
+        <section class="panel-card">
+            <div class="table-list">
+                {{#auctionBids}}
+                    <div class="table-row">
+                        <div>
+                            <strong>{{bidderUsername}}</strong>
+                            <p>{{formattedBidTime}}</p>
+                        </div>
+                        <div>
+                            <strong>{{amount}}</strong>
+                            <p>{{auctionStatus}}</p>
+                        </div>
+                    </div>
+                {{/auctionBids}}
+                {{^auctionBids}}<div class="empty-state">По этому аукциону ставок пока нет.</div>{{/auctionBids}}
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

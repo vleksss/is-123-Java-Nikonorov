@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">PROFILE</p>
+                <h2>Личный кабинет — {{currentUsername}}</h2>
+                <p>История ставок, участие в торгах и завершённые аукционы пользователя.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/mustache/auctions">Каталог</a>
+                {{#isOwner}}<a class="secondary-link" href="/mustache/owner/dashboard">Кабинет владельца</a>{{/isOwner}}
+                {{#isAdmin}}<a class="secondary-link" href="/mustache/admin/dashboard">Админка</a>{{/isAdmin}}
+                <a class="secondary-link" href="/logout">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option value="/thymeleaf/profile">Thymeleaf</option>
+                    <option value="/mustache/profile" selected>Mustache</option>
+                    <option value="/freemarker/profile">FreeMarker</option>
+                </select>
+            </div>
+        </section>
+
+        <div class="dashboard-grid">
+            <section class="panel-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">BIDS</p>
+                        <h3>Мои ставки</h3>
+                    </div>
+                </div>
+                <div class="table-list">
+                    {{#bidHistory}}
+                        <div class="table-row">
+                            <div>
+                                <strong>{{auctionTitle}}</strong>
+                                <p>{{auctionStatus}}</p>
+                            </div>
+                            <div>
+                                <strong>{{amount}}</strong>
+                                <p>{{formattedBidTime}}</p>
+                            </div>
+                        </div>
+                    {{/bidHistory}}
+                    {{^bidHistory}}<div class="empty-state">Ставок пока нет.</div>{{/bidHistory}}
+                </div>
+            </section>
+
+            <section class="panel-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">PARTICIPATION</p>
+                        <h3>Участвую</h3>
+                    </div>
+                </div>
+                <div class="table-list">
+                    {{#participatingAuctions}}
+                        <div class="table-row">
+                            <div>
+                                <strong>{{title}}</strong>
+                                <p>{{status}}</p>
+                            </div>
+                            <div>
+                                <strong>{{currentPrice}}</strong>
+                                <p>{{formattedEndTime}}</p>
+                            </div>
+                        </div>
+                    {{/participatingAuctions}}
+                    {{^participatingAuctions}}<div class="empty-state">Нет активных участий.</div>{{/participatingAuctions}}
+                </div>
+            </section>
+
+            <section class="panel-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">RESULT</p>
+                        <h3>Выигранные аукционы</h3>
+                    </div>
+                </div>
+                <div class="table-list">
+                    {{#winningAuctions}}
+                        <div class="table-row">
+                            <div>
+                                <strong>{{title}}</strong>
+                                <p>{{ownerUsername}}</p>
+                            </div>
+                            <div>
+                                <strong>{{currentPrice}}</strong>
+                                <p>{{formattedEndTime}}</p>
+                            </div>
+                        </div>
+                    {{/winningAuctions}}
+                    {{^winningAuctions}}<div class="empty-state">Побед пока нет.</div>{{/winningAuctions}}
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

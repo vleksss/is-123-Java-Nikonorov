@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ставки по аукциону</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="page-shell">
+    <aside class="sidebar">
+        <div class="brand-card">
+            <span class="brand-badge">Owner</span>
+            <h1>История ставок</h1>
+            <p>Полный список ставок по выбранному аукциону владельца.</p>
+        </div>
+        <nav class="side-nav">
+            <a href="/mustache/auctions">Каталог</a>
+            <a href="/mustache/owner/dashboard">Кабинет владельца</a>
+            <a href="/logout">Выход</a>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">Аукцион</p>
+                <h2>История ставок по лоту #{{auctionId}}</h2>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" href="/mustache/owner/dashboard">Назад</a>
+            </div>
+        </section>
+        <section class="panel-card">
+            <div class="table-list">
+                {{#auctionBids}}
+                <div class="table-row">
+                    <div><strong>{{bidderUsername}}</strong><p>{{formattedBidTime}}</p></div>
+                    <div><strong>{{amount}}</strong><p>{{auctionStatus}}</p></div>
+                </div>
+                {{/auctionBids}}
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
