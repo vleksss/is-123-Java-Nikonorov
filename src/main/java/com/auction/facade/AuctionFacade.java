@@ -21,7 +21,7 @@ public interface AuctionFacade {
     List<ProfileAuctionDto> getUserWinningAuctions(String username);
     List<ProfileAuctionDto> getOwnerAuctions(String username);
     List<ProfileBidDto> getAuctionBidHistory(Long auctionId);
-    List<UserAdminDto> getUsersForAdmin();
-    UserAdminDto changeUserEnabled(Long userId, boolean enabled);
-    UserAdminDto changeUserRole(Long userId, Role role);
+    List<UserAdminDto> getUsersForAdmin(String adminUsername);
+    UserAdminDto changeUserEnabled(String adminUsername, Long userId, boolean enabled);
+    UserAdminDto changeUserRole(String adminUsername, Long userId, Role role);
 }

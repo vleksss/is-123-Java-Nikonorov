@@ -393,3 +393,32 @@ button:hover {
         padding: 20px;
     }
 }
+
+
+.top-bar-right {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.engine-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: rgba(17, 28, 50, 0.72);
+}
+
+.engine-switch label {
+    display: inline;
+    gap: 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.engine-switch select {
+    min-width: 170px;
+    padding: 10px 12px;
+}

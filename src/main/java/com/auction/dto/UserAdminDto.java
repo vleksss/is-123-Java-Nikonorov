@@ -11,4 +11,27 @@ public class UserAdminDto {
     private String email;
     private String role;
     private boolean enabled;
+    private boolean canToggleEnabled;
+    private boolean canChangeRole;
+
+    public boolean isProtectedUser() {
+        return !canToggleEnabled && !canChangeRole;
+    }
+
+    public boolean getProtectedUser() {
+        return isProtectedUser();
+    }
+
+    public boolean isNextEnabledValue() {
+        return !enabled;
+    }
+
+    public boolean getNextEnabledValue() {
+        return isNextEnabledValue();
+    }
+
+    public String getStatusActionLabel() {
+        return enabled ? "Заблокировать" : "Разблокировать";
+    }
 }
+

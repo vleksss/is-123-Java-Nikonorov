@@ -1,6 +1,7 @@
 package com.auction.config;
 
 import com.auction.security.AuctionUserDetailsService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,16 +25,53 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/login", "/register", "/api/public/**").permitAll()
-                        .requestMatchers("/owner/**", "/api/owner/**").hasRole("OWNER")
+                        .requestMatchers(
+                                "/css/**",
+                                "/js/**",
+                                "/login",
+                                "/register",
+                                "/thymeleaf/login",
+                                "/thymeleaf/register",
+                                "/mustache/login",
+                                "/mustache/register",
+                                "/freemarker/login",
+                                "/freemarker/register",
+                                "/api/public/**"
+                        ).permitAll()
                         .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/", "/profile", "/thymeleaf/**", "/mustache/**", "/freemarker/**", "/bids").authenticated()
+                        .requestMatchers("/thymeleaf/admin/**", "/mustache/admin/**", "/freemarker/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/owner/**").hasRole("OWNER")
+                        .requestMatchers("/thymeleaf/owner/**", "/mustache/owner/**", "/freemarker/owner/**").hasRole("OWNER")
+                        .requestMatchers(
+                                "/",
+                                "/profile",
+                                "/owner/dashboard",
+                                "/owner/auctions/**",
+                                "/thymeleaf/**",
+                                "/mustache/**",
+                                "/freemarker/**",
+                                "/bids"
+                        ).authenticated()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/thymeleaf/auctions", true)
-                        .failureUrl("/login?error")
+                        .successHandler((request, response, authentication) -> {
+                            HttpSession session = request.getSession(false);
+                            String engine = session != null ? (String) session.getAttribute("LOGIN_ENGINE") : null;
+                            if (engine == null || engine.isBlank()) {
+                                engine = "thymeleaf";
+                            }
+                            response.sendRedirect("/" + engine + "/auctions");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            HttpSession session = request.getSession(false);
+                            String engine = session != null ? (String) session.getAttribute("LOGIN_ENGINE") : null;
+                            if (engine == null || engine.isBlank()) {
+                                engine = "thymeleaf";
+                            }
+                            response.sendRedirect("/" + engine + "/login?error");
+                        })
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")

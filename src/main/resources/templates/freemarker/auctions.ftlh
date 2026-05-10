@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>${pageTitle}</title>
+    <title>Аукционы</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -10,32 +10,32 @@
     <main class="content full-width-content">
         <section class="hero-card">
             <div>
-                <p class="eyebrow">Шаблонизатор</p>
-                <h2>${pageTitle}</h2>
-                <p>FreeMarker-версия каталога аукционов с теми же возможностями участия.</p>
+                <p class="eyebrow">CATALOG</p>
+                <h2>Каталог аукционов — ${currentUsername}</h2>
+                <p>Полный список лотов, ставки и управление страницами через единый интерфейс.</p>
             </div>
             <div class="hero-actions">
-                <a class="secondary-link" href="/thymeleaf/auctions">Thymeleaf</a>
-                <a class="secondary-link" href="/mustache/auctions">Mustache</a>
-                <a class="secondary-link" href="/profile">Личный кабинет</a>
+                <a class="secondary-link" href="/freemarker/profile">Профиль</a>
+                <#if isOwner><a class="secondary-link" href="/freemarker/owner/dashboard">Кабинет владельца</a></#if>
+                <#if isAdmin><a class="secondary-link" href="/freemarker/admin/dashboard">Админка</a></#if>
                 <a class="secondary-link" href="/logout">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option value="/thymeleaf/auctions">Thymeleaf</option>
+                    <option value="/mustache/auctions">Mustache</option>
+                    <option value="/freemarker/auctions" selected>FreeMarker</option>
+                </select>
             </div>
         </section>
 
-        <#if successMessage?? && successMessage?has_content>
-            <div class="alert success">${successMessage}</div>
-        </#if>
+        <#if successMessage?? && successMessage?has_content><div class="alert success">${successMessage}</div></#if>
+        <#if errorMessage?? && errorMessage?has_content><div class="alert error">${errorMessage}</div></#if>
 
-        <#if errorMessage?? && errorMessage?has_content>
-            <div class="alert error">${errorMessage}</div>
-        </#if>
-
-        <#if canCreateAuction?? && canCreateAuction>
+        <#if canCreateAuction>
             <section class="panel-card">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow">Роль OWNER</p>
-                        <h3>Создание аукциона</h3>
+                        <p class="eyebrow">OWNER</p>
+                        <h3>Создать аукцион</h3>
                     </div>
                 </div>
                 <form action="/owner/auctions" method="post" class="form-grid two-columns">
@@ -54,39 +54,44 @@
                     <label>Дата окончания
                         <input type="datetime-local" name="endTime" required>
                     </label>
-                    <button class="primary-button full-width" type="submit">Создать аукцион</button>
+                    <button class="primary-button full-width" type="submit">Создать лот</button>
                 </form>
             </section>
         </#if>
 
-        <section>
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Аукционы</p>
-                    <h3>Каталог лотов</h3>
-                </div>
-            </div>
-            <div class="auction-grid">
-                <#list auctions as auction>
-                    <article class="auction-card">
-                        <div class="auction-meta">
-                            <span class="tag">${auction.status}</span>
-                            <span class="muted">До ${auction.endTime}</span>
-                        </div>
-                        <h4>${auction.title}</h4>
-                        <p class="auction-description">${auction.description}</p>
-                        <div class="detail-row"><span>Владелец</span><strong>${auction.ownerUsername}</strong></div>
-                        <div class="detail-row"><span>Текущая цена</span><strong>${auction.currentPrice}</strong></div>
-                        <form action="/bids" method="post" class="form-grid compact-form">
-                            <input type="hidden" name="auctionId" value="${auction.id}">
-                            <label>Ваша ставка
-                                <input type="number" step="0.01" name="amount" required>
-                            </label>
-                            <button class="primary-button" type="submit">Сделать ставку</button>
-                        </form>
-                    </article>
-                </#list>
-            </div>
+        <section class="auction-grid">
+            <#list auctions as auction>
+                <article class="auction-card">
+                    <span class="tag">${auction.status}</span>
+                    <h4>${auction.title}</h4>
+                    <p class="auction-description">${auction.description}</p>
+
+                    <div class="detail-row">
+                        <span>Владелец</span>
+                        <strong>${auction.ownerUsername}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Стартовая цена</span>
+                        <strong>${auction.startPrice}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Текущая цена</span>
+                        <strong>${auction.currentPrice}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Окончание</span>
+                        <strong>${auction.formattedEndTime}</strong>
+                    </div>
+
+                    <form class="form-grid compact-form" action="/bids" method="post">
+                        <input type="hidden" name="auctionId" value="${auction.id}">
+                        <label>Сумма ставки
+                            <input type="number" step="0.01" name="amount" required>
+                        </label>
+                        <button class="primary-button" type="submit">Сделать ставку</button>
+                    </form>
+                </article>
+            </#list>
         </section>
     </main>
 </div>

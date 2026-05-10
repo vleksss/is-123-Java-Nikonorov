@@ -6,31 +6,24 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="page-shell">
-    <aside class="sidebar">
-        <div class="brand-card">
-            <span class="brand-badge">Owner</span>
-            <h1>Кабинет владельца</h1>
-            <p>Создавайте свои аукционы, контролируйте сроки и смотрите историю ставок.</p>
-        </div>
-        <nav class="side-nav">
-            <a th:href="@{/thymeleaf/auctions}">Каталог</a>
-            <a th:href="@{/profile}">Мой кабинет</a>
-            <a class="active" th:href="@{/owner/dashboard}">Мои аукционы</a>
-            <a th:if="${isAdmin}" th:href="@{/admin/dashboard}">Панель администратора</a>
-            <a th:href="@{/logout}">Выход</a>
-        </nav>
-    </aside>
-
-    <main class="content">
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
         <section class="hero-card">
             <div>
                 <p class="eyebrow">OWNER</p>
-                <h2 th:text="|Лоты пользователя ${currentUser}|">owner</h2>
-                <p>Создавайте новые аукционы и оперативно отслеживайте активность по своим лотам.</p>
+                <h2 th:text="|Кабинет владельца — ${currentUsername}|">Кабинет владельца</h2>
+                <p>Создание лотов, просмотр собственных аукционов и история ставок по каждому лоту.</p>
             </div>
             <div class="hero-actions">
-                <span class="stat-pill" th:text="|Моих аукционов: ${#lists.size(ownerAuctions)}|"></span>
+                <a class="secondary-link" th:href="@{/thymeleaf/auctions}">Каталог</a>
+                <a class="secondary-link" th:href="@{/thymeleaf/profile}">Профиль</a>
+                <a class="secondary-link" th:if="${isAdmin}" th:href="@{/thymeleaf/admin/dashboard}">Админка</a>
+                <a class="secondary-link" th:href="@{/logout}">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option th:value="@{/thymeleaf/owner/dashboard}" selected>Thymeleaf</option>
+                    <option th:value="@{/mustache/owner/dashboard}">Mustache</option>
+                    <option th:value="@{/freemarker/owner/dashboard}">FreeMarker</option>
+                </select>
             </div>
         </section>
 
@@ -40,7 +33,7 @@
         <section class="panel-card">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">Создание</p>
+                    <p class="eyebrow">CREATE</p>
                     <h3>Новый аукцион</h3>
                 </div>
             </div>
@@ -60,37 +53,31 @@
                 <label>Дата окончания
                     <input type="datetime-local" name="endTime" required>
                 </label>
-                <button class="primary-button full-width" type="submit">Опубликовать аукцион</button>
+                <button class="primary-button full-width" type="submit">Создать лот</button>
             </form>
         </section>
 
-        <section class="panel-card">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Контроль</p>
-                    <h3>Мои аукционы</h3>
+        <section class="auction-grid">
+            <article class="auction-card" th:each="auction : ${ownerAuctions}">
+                <span class="tag" th:text="${auction.status}">ACTIVE</span>
+                <h4 th:text="${auction.title}">title</h4>
+
+                <div class="detail-row">
+                    <span>Текущая цена</span>
+                    <strong th:text="${auction.currentPrice}">0</strong>
                 </div>
-            </div>
-            <div class="table-list">
-                <div class="table-row with-actions" th:each="auction : ${ownerAuctions}">
-                    <div>
-                        <strong th:text="${auction.title}">auction</strong>
-                        <p th:text="|Статус: ${auction.status}|"></p>
-                        <p th:text="|Окончание: ${#temporals.format(auction.endTime, 'dd.MM.yyyy HH:mm')}|"></p>
-                    </div>
-                    <div>
-                        <strong th:text="${auction.currentPrice}">0</strong>
-                        <p>Текущая цена</p>
-                    </div>
-                    <div class="row-actions">
-                        <a class="secondary-link" th:href="@{/owner/auctions/{id}/bids(id=${auction.id})}">История ставок</a>
-                        <form th:if="${auction.status != 'CLOSED'}" th:action="@{/owner/auctions/{id}/close(id=${auction.id})}" method="post">
-                            <button class="danger-button" type="submit">Закрыть</button>
-                        </form>
-                    </div>
+                <div class="detail-row">
+                    <span>Окончание</span>
+                    <strong th:text="${auction.formattedEndTime}">date</strong>
                 </div>
-                <div class="empty-state" th:if="${#lists.isEmpty(ownerAuctions)}">У вас пока нет созданных аукционов.</div>
-            </div>
+
+                <div class="row-actions compact-form">
+                    <a class="secondary-link" th:href="@{'/thymeleaf/owner/auctions/' + ${auction.id} + '/bids'}">История ставок</a>
+                    <form th:action="@{'/owner/auctions/' + ${auction.id} + '/close'}" method="post">
+                        <button class="danger-button" type="submit">Закрыть</button>
+                    </form>
+                </div>
+            </article>
         </section>
     </main>
 </div>

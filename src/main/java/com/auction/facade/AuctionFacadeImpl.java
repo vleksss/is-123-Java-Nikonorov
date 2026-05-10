@@ -95,20 +95,33 @@ public class AuctionFacadeImpl implements AuctionFacade {
     }
 
     @Override
-    public List<UserAdminDto> getUsersForAdmin() {
+    public List<UserAdminDto> getUsersForAdmin(String adminUsername) {
         return userService.getAll().stream()
-                .map(this::toUserAdmin)
+                .map(user -> toUserAdmin(user, adminUsername))
                 .toList();
     }
 
     @Override
-    public UserAdminDto changeUserEnabled(Long userId, boolean enabled) {
-        return toUserAdmin(userService.changeEnabled(userId, enabled));
+    public UserAdminDto changeUserEnabled(String adminUsername, Long userId, boolean enabled) {
+        validateAdminOperation(adminUsername, userId);
+        return toUserAdmin(userService.changeEnabled(userId, enabled), adminUsername);
     }
 
     @Override
-    public UserAdminDto changeUserRole(Long userId, Role role) {
-        return toUserAdmin(userService.updateRole(userId, role));
+    public UserAdminDto changeUserRole(String adminUsername, Long userId, Role role) {
+        validateAdminOperation(adminUsername, userId);
+        return toUserAdmin(userService.updateRole(userId, role), adminUsername);
+    }
+
+    private void validateAdminOperation(String adminUsername, Long userId) {
+        User actor = userService.getByUsername(adminUsername);
+        User target = userService.getById(userId);
+        if (actor.getId().equals(target.getId())) {
+            throw new IllegalStateException("Администратор не может изменять свой собственный аккаунт");
+        }
+        if (target.getRole() == Role.ADMIN) {
+            throw new IllegalStateException("Администратор не может изменять другого администратора");
+        }
     }
 
     private ProfileAuctionDto toProfileAuction(Auction auction) {
@@ -134,13 +147,17 @@ public class AuctionFacadeImpl implements AuctionFacade {
                 .build();
     }
 
-    private UserAdminDto toUserAdmin(User user) {
+    private UserAdminDto toUserAdmin(User user, String adminUsername) {
+        User actor = userService.getByUsername(adminUsername);
+        boolean protectedUser = actor.getId().equals(user.getId()) || user.getRole() == Role.ADMIN;
         return UserAdminDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .enabled(user.isEnabled())
+                .canToggleEnabled(!protectedUser)
+                .canChangeRole(!protectedUser)
                 .build();
     }
 }

@@ -6,30 +6,23 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="page-shell">
-    <aside class="sidebar">
-        <div class="brand-card">
-            <span class="brand-badge">Owner</span>
-            <h1>История ставок</h1>
-            <p>Полный список ставок по выбранному аукциону владельца.</p>
-        </div>
-        <nav class="side-nav">
-            <a th:href="@{/thymeleaf/auctions}">Каталог</a>
-            <a th:href="@{/profile}">Мой кабинет</a>
-            <a class="active" th:href="@{/owner/dashboard}">Кабинет владельца</a>
-            <a th:href="@{/logout}">Выход</a>
-        </nav>
-    </aside>
-
-    <main class="content">
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
         <section class="hero-card">
             <div>
-                <p class="eyebrow">Аукцион</p>
-                <h2 th:text="|История ставок по лоту #${auctionId}|">История ставок</h2>
-                <p>Список отсортирован по размеру ставки от максимальной к минимальной.</p>
+                <p class="eyebrow">OWNER</p>
+                <h2 th:text="|Ставки по аукциону #${auctionId}|">Ставки по аукциону</h2>
+                <p>Полная история ставок по выбранному лоту владельца.</p>
             </div>
             <div class="hero-actions">
-                <a class="secondary-link" th:href="@{/owner/dashboard}">Назад к моим аукционам</a>
+                <a class="secondary-link" th:href="@{/thymeleaf/owner/dashboard}">Назад</a>
+                <a class="secondary-link" th:href="@{/thymeleaf/auctions}">Каталог</a>
+                <a class="secondary-link" th:href="@{/logout}">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option th:value="@{'/thymeleaf/owner/auctions/' + ${auctionId} + '/bids'}" selected>Thymeleaf</option>
+                    <option th:value="@{'/mustache/owner/auctions/' + ${auctionId} + '/bids'}">Mustache</option>
+                    <option th:value="@{'/freemarker/owner/auctions/' + ${auctionId} + '/bids'}">FreeMarker</option>
+                </select>
             </div>
         </section>
 
@@ -41,7 +34,7 @@
                 <div class="table-row" th:each="bid : ${auctionBids}">
                     <div>
                         <strong th:text="${bid.bidderUsername}">user</strong>
-                        <p th:text="${#temporals.format(bid.bidTime, 'dd.MM.yyyy HH:mm')}">date</p>
+                        <p th:text="${bid.formattedBidTime}">time</p>
                     </div>
                     <div>
                         <strong th:text="${bid.amount}">0</strong>

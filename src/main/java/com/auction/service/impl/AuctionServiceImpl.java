@@ -12,6 +12,7 @@ import com.auction.service.AuctionService;
 import com.auction.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -49,11 +50,13 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public Auction getById(Long id) {
+        refreshStatuses();
         return auctionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Аукцион не найден"));
     }
 
     @Override
     public List<Auction> getAll() {
+        refreshStatuses();
         return auctionRepository.findAll().stream()
                 .sorted(Comparator.comparing(Auction::getEndTime).reversed())
                 .toList();
@@ -61,16 +64,19 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public List<Auction> getActive() {
+        refreshStatuses();
         return auctionRepository.findByStatusOrderByEndTimeAsc(AuctionStatus.ACTIVE);
     }
 
     @Override
     public List<Auction> getByOwner(String username) {
+        refreshStatuses();
         return auctionRepository.findByOwnerOrderByEndTimeDesc(userService.getByUsername(username));
     }
 
     @Override
     public List<Auction> getParticipating(String username) {
+        refreshStatuses();
         User user = userService.getByUsername(username);
         return bidRepository.findByUserOrderByBidTimeDesc(user).stream()
                 .map(Bid::getAuction)
@@ -91,6 +97,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public Auction closeByAdmin(Long id) {
         Auction auction = getById(id);
@@ -98,6 +105,7 @@ public class AuctionServiceImpl implements AuctionService {
         return auctionRepository.save(auction);
     }
 
+    @Transactional
     @Override
     public Auction closeByOwner(Long id, String username) {
         Auction auction = getById(id);
@@ -107,4 +115,26 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setStatus(AuctionStatus.CLOSED);
         return auctionRepository.save(auction);
     }
+
+    @Transactional
+    protected void refreshStatuses() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Auction> changed = auctionRepository.findAll().stream()
+                .filter(auction -> updateStatus(auction, now))
+                .toList();
+        if (!changed.isEmpty()) {
+            auctionRepository.saveAll(changed);
+        }
+    }
+
+    private boolean updateStatus(Auction auction, LocalDateTime now) {
+        AuctionStatus oldStatus = auction.getStatus();
+        if (auction.getEndTime() != null && !auction.getEndTime().isAfter(now)) {
+            auction.setStatus(AuctionStatus.CLOSED);
+        } else if (auction.getStartTime() != null && !auction.getStartTime().isAfter(now) && auction.getStatus() == AuctionStatus.DRAFT) {
+            auction.setStatus(AuctionStatus.ACTIVE);
+        }
+        return oldStatus != auction.getStatus();
+    }
 }
+

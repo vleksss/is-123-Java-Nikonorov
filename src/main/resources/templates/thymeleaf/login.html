@@ -6,28 +6,46 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="auth-body">
-<div class="auth-shell">
-    <div class="auth-brand">
-        <span class="brand-badge">Auction</span>
-        <h1> платформа аукционов</h1>
-        <p></p>
-    </div>
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">AUCTION</p>
+                <h2>Вход в систему</h2>
+                <p>Единый интерфейс аукциона. Выберите движок справа и войдите в систему.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" th:href="@{/thymeleaf/register}">Регистрация</a>
+                <select onchange="window.location.href=this.value">
+                    <option th:value="@{/thymeleaf/login}" selected>Thymeleaf</option>
+                    <option th:value="@{/mustache/login}">Mustache</option>
+                    <option th:value="@{/freemarker/login}">FreeMarker</option>
+                </select>
+            </div>
+        </section>
 
-    <div class="auth-card">
-        <h2>Вход в систему</h2>
-        <div class="alert error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <div class="alert success" th:if="${registeredMessage}" th:text="${registeredMessage}"></div>
         <div class="alert success" th:if="${logoutMessage}" th:text="${logoutMessage}"></div>
-        <form method="post" th:action="@{/login}" class="form-grid">
-            <label>Логин
-                <input type="text" name="username" required>
-            </label>
-            <label>Пароль
-                <input type="password" name="password" required>
-            </label>
-            <button class="primary-button" type="submit">Войти</button>
-        </form>
-        <a class="auth-link" th:href="@{/register}">Создать аккаунт</a>
-    </div>
+        <div class="alert error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <section class="panel-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">AUTH</p>
+                    <h3>Авторизация</h3>
+                </div>
+            </div>
+            <form th:action="@{/login}" method="post" class="form-grid">
+                <label>Логин
+                    <input type="text" name="username" required>
+                </label>
+                <label>Пароль
+                    <input type="password" name="password" required>
+                </label>
+                <button class="primary-button" type="submit">Войти</button>
+            </form>
+        </section>
+    </main>
 </div>
 </body>
 </html>

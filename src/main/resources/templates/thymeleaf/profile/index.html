@@ -2,37 +2,28 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Личный кабинет</title>
+    <title>Профиль</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="page-shell">
-    <aside class="sidebar">
-        <div class="brand-card">
-            <span class="brand-badge">Profile</span>
-            <h1>Личный кабинет</h1>
-            <p>Ваша история ставок, участие в торгах и завершённые победы в одном месте.</p>
-        </div>
-        <nav class="side-nav">
-            <a th:href="@{/thymeleaf/auctions}">Каталог</a>
-            <a class="active" th:href="@{/profile}">Мой кабинет</a>
-            <a th:if="${isOwner}" th:href="@{/owner/dashboard}">Кабинет владельца</a>
-            <a th:if="${isAdmin}" th:href="@{/admin/dashboard}">Панель администратора</a>
-            <a th:href="@{/logout}">Выход</a>
-        </nav>
-    </aside>
-
-    <main class="content">
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
         <section class="hero-card">
             <div>
-                <p class="eyebrow">Пользователь</p>
-                <h2 th:text="${currentUser}">user</h2>
-                <p>Следите за своей активностью и быстро возвращайтесь к интересующим торгам.</p>
+                <p class="eyebrow">PROFILE</p>
+                <h2 th:text="|Личный кабинет — ${currentUsername}|">Личный кабинет</h2>
+                <p>История ставок, участие в торгах и завершённые аукционы пользователя.</p>
             </div>
             <div class="hero-actions">
-                <span class="stat-pill" th:text="|Ставок: ${#lists.size(bidHistory)}|"></span>
-                <span class="stat-pill" th:text="|Участий: ${#lists.size(participatingAuctions)}|"></span>
-                <span class="stat-pill" th:text="|Побед: ${#lists.size(winningAuctions)}|"></span>
+                <a class="secondary-link" th:href="@{/thymeleaf/auctions}">Каталог</a>
+                <a class="secondary-link" th:if="${isOwner}" th:href="@{/thymeleaf/owner/dashboard}">Кабинет владельца</a>
+                <a class="secondary-link" th:if="${isAdmin}" th:href="@{/thymeleaf/admin/dashboard}">Админка</a>
+                <a class="secondary-link" th:href="@{/logout}">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option th:value="@{/thymeleaf/profile}" selected>Thymeleaf</option>
+                    <option th:value="@{/mustache/profile}">Mustache</option>
+                    <option th:value="@{/freemarker/profile}">FreeMarker</option>
+                </select>
             </div>
         </section>
 
@@ -40,7 +31,7 @@
             <section class="panel-card">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow">История</p>
+                        <p class="eyebrow">BIDS</p>
                         <h3>Мои ставки</h3>
                     </div>
                 </div>
@@ -48,61 +39,61 @@
                     <div class="table-row" th:each="bid : ${bidHistory}">
                         <div>
                             <strong th:text="${bid.auctionTitle}">auction</strong>
-                            <p th:text="|Статус: ${bid.auctionStatus}|"></p>
+                            <p th:text="${bid.auctionStatus}">ACTIVE</p>
                         </div>
                         <div>
                             <strong th:text="${bid.amount}">0</strong>
-                            <p th:text="${#temporals.format(bid.bidTime, 'dd.MM.yyyy HH:mm')}">date</p>
+                            <p th:text="${bid.formattedBidTime}">time</p>
                         </div>
                     </div>
-                    <div class="empty-state" th:if="${#lists.isEmpty(bidHistory)}">Пока нет ни одной ставки.</div>
+                    <div class="empty-state" th:if="${#lists.isEmpty(bidHistory)}">Ставок пока нет.</div>
                 </div>
             </section>
 
             <section class="panel-card">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow">Торги</p>
-                        <h3>Аукционы, где я участвую</h3>
+                        <p class="eyebrow">PARTICIPATION</p>
+                        <h3>Участвую</h3>
                     </div>
                 </div>
                 <div class="table-list">
                     <div class="table-row" th:each="auction : ${participatingAuctions}">
                         <div>
-                            <strong th:text="${auction.title}">auction</strong>
-                            <p th:text="|Владелец: ${auction.ownerUsername}|"></p>
+                            <strong th:text="${auction.title}">title</strong>
+                            <p th:text="${auction.status}">status</p>
                         </div>
                         <div>
                             <strong th:text="${auction.currentPrice}">0</strong>
-                            <p th:text="${auction.status}">ACTIVE</p>
+                            <p th:text="${auction.formattedEndTime}">date</p>
                         </div>
                     </div>
-                    <div class="empty-state" th:if="${#lists.isEmpty(participatingAuctions)}">Вы ещё не участвовали в аукционах.</div>
+                    <div class="empty-state" th:if="${#lists.isEmpty(participatingAuctions)}">Нет активных участий.</div>
+                </div>
+            </section>
+
+            <section class="panel-card">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">RESULT</p>
+                        <h3>Выигранные аукционы</h3>
+                    </div>
+                </div>
+                <div class="table-list">
+                    <div class="table-row" th:each="auction : ${winningAuctions}">
+                        <div>
+                            <strong th:text="${auction.title}">title</strong>
+                            <p th:text="${auction.ownerUsername}">owner</p>
+                        </div>
+                        <div>
+                            <strong th:text="${auction.currentPrice}">0</strong>
+                            <p th:text="${auction.formattedEndTime}">date</p>
+                        </div>
+                    </div>
+                    <div class="empty-state" th:if="${#lists.isEmpty(winningAuctions)}">Побед пока нет.</div>
                 </div>
             </section>
         </div>
-
-        <section class="panel-card">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Результаты</p>
-                    <h3>Мои победы</h3>
-                </div>
-            </div>
-            <div class="table-list">
-                <div class="table-row" th:each="auction : ${winningAuctions}">
-                    <div>
-                        <strong th:text="${auction.title}">auction</strong>
-                        <p th:text="|Закрыт: ${#temporals.format(auction.endTime, 'dd.MM.yyyy HH:mm')}|"></p>
-                    </div>
-                    <div>
-                        <strong th:text="${auction.currentPrice}">0</strong>
-                        <p>Победная ставка</p>
-                    </div>
-                </div>
-                <div class="empty-state" th:if="${#lists.isEmpty(winningAuctions)}">Побед пока нет.</div>
-            </div>
-        </section>
     </main>
 </div>
 </body>

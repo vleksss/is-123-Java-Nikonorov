@@ -6,30 +6,48 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="auth-body">
-<div class="auth-shell">
-    <div class="auth-brand">
-        <span class="brand-badge">Join</span>
-        <h1>Создание аккаунта участника</h1>
-        <p></p>
-    </div>
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">AUCTION</p>
+                <h2>Регистрация</h2>
+                <p>Создайте обычного пользователя системы. Роль OWNER и ADMIN через регистрацию не выдаётся.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="secondary-link" th:href="@{/thymeleaf/login}">Вход</a>
+                <select onchange="window.location.href=this.value">
+                    <option th:value="@{/thymeleaf/register}" selected>Thymeleaf</option>
+                    <option th:value="@{/mustache/register}">Mustache</option>
+                    <option th:value="@{/freemarker/register}">FreeMarker</option>
+                </select>
+            </div>
+        </section>
 
-    <div class="auth-card">
-        <h2>Регистрация</h2>
-        <div class="alert error" th:if="${error}" th:text="${error}"></div>
-        <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="form-grid">
-            <label>Логин
-                <input type="text" th:field="*{username}" required>
-            </label>
-            <label>Email
-                <input type="email" th:field="*{email}" required>
-            </label>
-            <label>Пароль
-                <input type="password" th:field="*{password}" required>
-            </label>
-            <button class="primary-button" type="submit">Создать аккаунт</button>
-        </form>
-        <a class="auth-link" th:href="@{/login}">У меня уже есть аккаунт</a>
-    </div>
+        <div class="alert error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <section class="panel-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">AUTH</p>
+                    <h3>Данные пользователя</h3>
+                </div>
+            </div>
+            <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="form-grid">
+                <input type="hidden" name="engine" value="thymeleaf">
+                <label>Логин
+                    <input type="text" th:field="*{username}" required>
+                </label>
+                <label>Email
+                    <input type="email" th:field="*{email}" required>
+                </label>
+                <label>Пароль
+                    <input type="password" th:field="*{password}" required>
+                </label>
+                <button class="primary-button" type="submit">Зарегистрироваться</button>
+            </form>
+        </section>
+    </main>
 </div>
 </body>
 </html>

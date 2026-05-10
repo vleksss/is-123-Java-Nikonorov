@@ -2,36 +2,28 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Панель администратора</title>
+    <title>Админка</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="page-shell">
-    <aside class="sidebar">
-        <div class="brand-card">
-            <span class="brand-badge">Admin</span>
-            <h1>Панель администратора</h1>
-            <p>Управление пользователями, ролями и всеми аукционами системы.</p>
-        </div>
-        <nav class="side-nav">
-            <a th:href="@{/thymeleaf/auctions}">Каталог</a>
-            <a th:href="@{/profile}">Мой кабинет</a>
-            <a th:if="${isOwner}" th:href="@{/owner/dashboard}">Кабинет владельца</a>
-            <a class="active" th:href="@{/admin/dashboard}">Админ-панель</a>
-            <a th:href="@{/logout}">Выход</a>
-        </nav>
-    </aside>
-
-    <main class="content">
+<div class="page-shell single-engine">
+    <main class="content full-width-content">
         <section class="hero-card">
             <div>
                 <p class="eyebrow">ADMIN</p>
-                <h2>Системное управление</h2>
-                <p>Блокируйте пользователей, меняйте роли и завершайте любые аукционы.</p>
+                <h2 th:text="|Панель администратора — ${currentUsername}|">Панель администратора</h2>
+                <p>Управление пользователями и всеми аукционами системы.</p>
             </div>
             <div class="hero-actions">
-                <span class="stat-pill" th:text="|Пользователей: ${#lists.size(users)}|"></span>
-                <span class="stat-pill" th:text="|Аукционов: ${#lists.size(allAuctions)}|"></span>
+                <a class="secondary-link" th:href="@{/thymeleaf/auctions}">Каталог</a>
+                <a class="secondary-link" th:href="@{/thymeleaf/profile}">Профиль</a>
+                <a class="secondary-link" th:if="${isOwner}" th:href="@{/thymeleaf/owner/dashboard}">Кабинет владельца</a>
+                <a class="secondary-link" th:href="@{/logout}">Выход</a>
+                <select onchange="window.location.href=this.value">
+                    <option th:value="@{/thymeleaf/admin/dashboard}" selected>Thymeleaf</option>
+                    <option th:value="@{/mustache/admin/dashboard}">Mustache</option>
+                    <option th:value="@{/freemarker/admin/dashboard}">FreeMarker</option>
+                </select>
             </div>
         </section>
 
@@ -42,10 +34,11 @@
             <section class="panel-card">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow">Пользователи</p>
-                        <h3>Управление доступом</h3>
+                        <p class="eyebrow">USERS</p>
+                        <h3>Пользователи</h3>
                     </div>
                 </div>
+
                 <div class="table-list">
                     <div class="table-row with-actions" th:each="user : ${users}">
                         <div>
@@ -57,16 +50,25 @@
                             <p th:text="${user.enabled ? 'Активен' : 'Заблокирован'}">status</p>
                         </div>
                         <div class="row-actions stacked-actions">
-                            <form th:action="@{/admin/users/{id}/status(id=${user.id})}" method="post">
-                                <input type="hidden" name="enabled" th:value="${!user.enabled}">
-                                <button th:classappend="${user.enabled} ? 'danger-button' : 'primary-button'" type="submit" th:text="${user.enabled ? 'Заблокировать' : 'Разблокировать'}">Кнопка</button>
-                            </form>
-                            <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post" class="role-form">
-                                <select name="role">
-                                    <option th:each="role : ${roles}" th:value="${role}" th:text="${role}" th:selected="${role.name() == user.role}"></option>
-                                </select>
-                                <button class="secondary-button" type="submit">Сменить роль</button>
-                            </form>
+                            <div th:if="${user.protectedUser}" class="tag">Недоступно</div>
+                            <div th:unless="${user.protectedUser}" class="row-actions stacked-actions">
+                                <form th:action="@{'/admin/users/' + ${user.id} + '/status'}" method="post">
+                                    <input type="hidden" name="enabled" th:value="${user.nextEnabledValue}">
+                                    <button class="danger-button" type="submit" th:text="${user.statusActionLabel}">Статус</button>
+                                </form>
+                                <form th:action="@{'/admin/users/' + ${user.id} + '/role'}" method="post">
+                                    <input type="hidden" name="role" value="USER">
+                                    <button class="secondary-button" type="submit">Сделать USER</button>
+                                </form>
+                                <form th:action="@{'/admin/users/' + ${user.id} + '/role'}" method="post">
+                                    <input type="hidden" name="role" value="OWNER">
+                                    <button class="secondary-button" type="submit">Сделать OWNER</button>
+                                </form>
+                                <form th:action="@{'/admin/users/' + ${user.id} + '/role'}" method="post">
+                                    <input type="hidden" name="role" value="ADMIN">
+                                    <button class="secondary-button" type="submit">Сделать ADMIN</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,22 +77,23 @@
             <section class="panel-card">
                 <div class="section-heading">
                     <div>
-                        <p class="eyebrow">Аукционы</p>
-                        <h3>Контроль торгов</h3>
+                        <p class="eyebrow">AUCTIONS</p>
+                        <h3>Все аукционы</h3>
                     </div>
                 </div>
+
                 <div class="table-list">
                     <div class="table-row with-actions" th:each="auction : ${allAuctions}">
                         <div>
-                            <strong th:text="${auction.title}">auction</strong>
-                            <p th:text="|Владелец: ${auction.ownerUsername}|"></p>
+                            <strong th:text="${auction.title}">title</strong>
+                            <p th:text="${auction.ownerUsername}">owner</p>
                         </div>
                         <div>
-                            <strong th:text="${auction.currentPrice}">0</strong>
-                            <p th:text="${auction.status}">ACTIVE</p>
+                            <strong th:text="${auction.status}">ACTIVE</strong>
+                            <p th:text="${auction.currentPrice}">0</p>
                         </div>
                         <div class="row-actions">
-                            <form th:if="${auction.status != 'CLOSED'}" th:action="@{/admin/auctions/{id}/close(id=${auction.id})}" method="post">
+                            <form th:action="@{'/admin/auctions/' + ${auction.id} + '/close'}" method="post">
                                 <button class="danger-button" type="submit">Закрыть аукцион</button>
                             </form>
                         </div>
